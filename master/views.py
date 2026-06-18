@@ -4,9 +4,10 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import RoomType, Room
 from .serializers import *
-
+from rest_framework.permissions import IsAuthenticated
 
 class RoomTypeViewSet(viewsets.ModelViewSet):
+    permission_classes  = [IsAuthenticated]
     queryset = RoomType.objects.all()
     serializer_class = RoomTypeSerializer
 

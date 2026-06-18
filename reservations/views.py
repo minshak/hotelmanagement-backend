@@ -6,10 +6,12 @@ from .models import CheckIn
 from .serializer import CheckInSerializer
 from .models import CheckOut
 from .serializer import CheckOutSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 
-class CheckInViewSet(viewsets.ModelViewSet):
+class CheckInViewSet(viewsets.ModelViewSet): 
+    permission_classes  = [IsAuthenticated]
     queryset = CheckIn.objects.all()
     serializer_class = CheckInSerializer
 
