@@ -44,9 +44,8 @@ INSTALLED_APPS = [
     'master',
     'reservations',
 ]
-
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Keep this right at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -132,6 +131,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True  # Add this if you handle tokens/sessions
+
+# Explicitly whitelist common frontend development ports
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000"]

@@ -27,9 +27,9 @@ class CheckIn(models.Model):
     )
 
     customer = models.ForeignKey(
-        Customer,
-        on_delete=models.PROTECT,
-        related_name="checkins"
+    Customer,
+    on_delete=models.CASCADE,
+    related_name="checkins"
     )
 
     checkin_date = models.DateField()
@@ -76,7 +76,7 @@ class CheckOut(models.Model):
 
     checkin = models.OneToOneField(
         CheckIn,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="checkout"
     )
 

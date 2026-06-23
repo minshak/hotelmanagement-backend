@@ -17,5 +17,6 @@ class CheckInViewSet(viewsets.ModelViewSet):
 
 
 class CheckOutViewSet(viewsets.ModelViewSet):
+    permission_classes  = [IsAuthenticated]
     queryset = CheckOut.objects.all()
     serializer_class = CheckOutSerializer
