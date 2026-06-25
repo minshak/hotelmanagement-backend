@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'account',
     'master',
     'reservations',
+    'bookings',
 ]
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Keep this right at the top

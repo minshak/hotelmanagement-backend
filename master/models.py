@@ -89,8 +89,10 @@ class Customer(models.Model):
 
     # Upload file/image
     id_proof = models.FileField(
-        upload_to='customer_id_proofs/'
-    )
+    upload_to='customer_id_proofs/',
+    blank=True,
+    null=True
+)
 
     is_active = models.BooleanField(
         default=True

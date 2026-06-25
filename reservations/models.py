@@ -27,13 +27,12 @@ class CheckIn(models.Model):
     )
 
     customer = models.ForeignKey(
-    Customer,
-    on_delete=models.CASCADE,
-    related_name="checkins"
+        Customer,
+        on_delete=models.CASCADE,
+        related_name="checkins"
     )
 
     checkin_date = models.DateField()
-
     checkin_time = models.TimeField()
 
     advance_amount = models.DecimalField(
@@ -48,6 +47,12 @@ class CheckIn(models.Model):
         default=0
     )
 
+    total_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
     pay_mode = models.CharField(
         max_length=20,
         choices=PAYMENT_MODES
@@ -57,6 +62,12 @@ class CheckIn(models.Model):
         max_length=20,
         choices=STATUS_CHOICES,
         default="CHECKED_IN"
+    )
+
+  
+    remarks = models.TextField(
+        blank=True,
+        null=True
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -95,6 +106,11 @@ class CheckOut(models.Model):
     pay_type = models.CharField(
         max_length=20,
         choices=PAYMENT_TYPES
+    )
+    
+    remarks = models.TextField(
+        blank=True,
+        null=True
     )
 
     created_at = models.DateTimeField(
