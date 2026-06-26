@@ -24,10 +24,7 @@ class RoomType(models.Model):
 
     def __str__(self):
         return f"{self.category} - {self.get_is_ac_display()}"
-
-
 class Room(models.Model):
-
     ROOM_STATUS = [
         ("AVAILABLE", "Available"),
         ("OCCUPIED", "Occupied"),
@@ -35,21 +32,23 @@ class Room(models.Model):
     ]
 
     room_no = models.CharField(max_length=10, unique=True)
-
-    room_type = models.ForeignKey(
-        RoomType,
-        on_delete=models.PROTECT
-    )
-
-    status = models.CharField(
-        max_length=20,
-        choices=ROOM_STATUS,
-        default="AVAILABLE"
-    )
-
+    room_type = models.ForeignKey(RoomType, on_delete=models.PROTECT)
+    status = models.CharField(max_length=20, choices=ROOM_STATUS, default="AVAILABLE")
     active = models.BooleanField(default=True)
+
     def __str__(self):
         return f"{self.room_no} - {self.room_type}"
+
+    # --- New Status Helper Methods ---
+    def occupy(self):
+        """Marks the room as occupied."""
+        self.status = "OCCUPIED"
+        self.save(update_fields=["status"])
+
+    def make_available(self):
+        """Marks the room as available."""
+        self.status = "AVAILABLE"
+        self.save(update_fields=["status"])
     
 
 class Customer(models.Model):
