@@ -37,8 +37,11 @@ class CheckInSerializer(serializers.ModelSerializer):
         time_str = str(obj.checkin_time)[:5] if hasattr(obj, 'checkin_time') else "00:00"
         return f"{date_str} @ {time_str}"
 
-
 class CheckOutSerializer(serializers.ModelSerializer):
+    # Traverses the relationships: CheckOut -> CheckIn -> Customer/Room
+    customer_name = serializers.ReadOnlyField(source='checkin.customer.customer_name')
+    room_no = serializers.ReadOnlyField(source='checkin.room.room_no')
+
     class Meta:
         model = CheckOut
-        fields = "__all__"
+        fields = '__all__'
