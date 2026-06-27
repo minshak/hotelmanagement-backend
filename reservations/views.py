@@ -102,12 +102,10 @@ from math import ceil
 #             status=status.HTTP_201_CREATED
 #         )
 
-
 class CheckOutViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = CheckOutSerializer
     
-    # Using select_related minimizes DB hits for nested relations during listings and receipt creation
     queryset = CheckOut.objects.select_related(
         'checkin__customer', 
         'checkin__room',
@@ -120,11 +118,7 @@ class CheckOutViewSet(viewsets.ModelViewSet):
 
         checkin = serializer.validated_data["checkin"]
 
-        # Calculate durations
-        checkin_datetime = datetime.combine(
-            checkin.checkin_date,
-            checkin.checkin_time
-        )
+        checkin_datetime = datetime.combine(checkin.checkin_date, checkin.checkin_time)
         checkout_datetime = datetime.combine(
             serializer.validated_data["checkout_date"],
             serializer.validated_data["checkout_time"]
@@ -134,31 +128,25 @@ class CheckOutViewSet(viewsets.ModelViewSet):
         hours = duration.total_seconds() / 3600
         total_days = max(1, ceil(hours / 24))
 
-        # Calculate final financial breakdown
         rent = checkin.room.room_type.rent
         total_amount = rent * total_days
         balance = total_amount - checkin.advance_amount
 
-        # Use an atomic block to ensure all database updates succeed together
         with transaction.atomic():
-            # 1. Save Checkout record
             checkout = serializer.save(
                 total_days=total_days,
                 balance_paid=balance
             )
 
-            # 2. Update parent CheckIn entry with the calculated total and clear pending
             checkin.total_amount = total_amount
-            checkin.pending_amount = 0  # Assuming balance is fully paid at checkout
+            checkin.pending_amount = 0  
             checkin.status = "CHECKED_OUT"
             checkin.save(update_fields=['total_amount', 'pending_amount', 'status'])
 
-            # 3. Direct update to make certain the room gets freed
             room = checkin.room
             room.status = "AVAILABLE"
             room.save(update_fields=['status'])
 
-        # Using explicit context serialization to match custom readout formatting
         return Response(
             self.get_serializer(checkout).data,
             status=status.HTTP_201_CREATED
@@ -182,8 +170,14 @@ class CheckOutViewSet(viewsets.ModelViewSet):
         customer = checkin.customer
         room = checkin.room
 
+        # --- FIX: Define the rent variable in this local scope ---
+        rent = getattr(room.room_type, 'rent', 0.0)
+
         # Gracefully handle room type dynamically 
         room_type_name = getattr(room.room_type, 'name', str(room.room_type))
+
+        # Safeguard fallback values if fields don't exist on checkin model
+        base_rent = float(getattr(checkin, 'base_daily_rent', None) or rent)
 
         receipt_data = {
             "receipt_no": f"REC-{checkout.id:06d}",
@@ -199,8 +193,8 @@ class CheckOutViewSet(viewsets.ModelViewSet):
                 "total_days": checkout.total_days,
             },
             "financial_breakdown": {
-                "base_daily_rent": float(checkin.base_daily_rent or rent),
-                "subtotal": float((checkin.base_daily_rent or rent) * checkout.total_days),
+                "base_daily_rent": base_rent,
+                "subtotal": float(base_rent * checkout.total_days),
                 "advance_paid": float(checkin.advance_amount),
                 "balance_paid": float(checkout.balance_paid),
                 "total_amount_charged": float(checkin.total_amount),
