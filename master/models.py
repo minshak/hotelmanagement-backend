@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.validators import RegexValidator
 
 class RoomType(models.Model):
 
@@ -69,14 +69,19 @@ class Customer(models.Model):
     customer_name = models.CharField(
         max_length=100
     )
-
-    mobile_no = models.CharField(
-        max_length=15
+    mobile_regex = RegexValidator(
+    regex=r'^[6-9]\d{9}$', 
+    message="Mobile number must be a valid 10-digit Indian number starting with 6, 7, 8, or 9."
     )
-
+    mobile_no = models.CharField(
+    validators=[mobile_regex],
+    max_length=10,
+    unique=True
+    )
     email = models.EmailField(
         blank=True,
-        null=True
+        null=True,
+        unique=True
     )
 
     address = models.TextField()
