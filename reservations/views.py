@@ -71,7 +71,10 @@ class CheckInViewSet(viewsets.ModelViewSet):
         normal_style = styles['Normal']
 
         # Title Layout Block
-        story.append(Paragraph("CHECK-IN / ADVANCE PAYMENT RECEIPT", title_style))
+        
+        story.append(Paragraph("Swapna Residency",title_style))
+        story.append(Paragraph("Durga,Hosur,Tamil Nadu",normal_style))
+        story.append(Paragraph("CHECK-IN / ADVANCE  RECEIPT", normal_style))
         story.append(Paragraph(f"<b>Receipt Reference:</b> ARR-{checkin.id:06d}", normal_style))
         story.append(Paragraph(f"<b>Date:</b> {checkin.checkin_date} @ {checkin.checkin_time}", normal_style))
         story.append(Spacer(1, 15))
@@ -110,6 +113,7 @@ class CheckInViewSet(viewsets.ModelViewSet):
             ('TOPPADDING', (0, 0), (-1, -1), 6),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ]))
+           
         story.append(ledger_table)
         story.append(Spacer(1, 15))
 
@@ -336,7 +340,9 @@ class CheckOutViewSet(viewsets.ModelViewSet):
         normal_style = styles['Normal']
 
         # Header Title
-        story.append(Paragraph("INVOICE / RECEIPT", title_style))
+        story.append(Paragraph("Swapna Residency",title_style))
+        story.append(Paragraph("Durga,Hosur,Tamil Nadu",normal_style))
+        story.append(Paragraph(" RECEIPT", normal_style))
         story.append(Paragraph(f"<b>Receipt No:</b> REC-{checkout.id:06d}", normal_style))
         story.append(Paragraph(f"<b>Date:</b> {checkout.created_at.strftime('%Y-%m-%d %H:%M') if hasattr(checkout.created_at, 'strftime') else checkout.created_at}", normal_style))
         story.append(Spacer(1, 15))
