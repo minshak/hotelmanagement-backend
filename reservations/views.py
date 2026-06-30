@@ -9,12 +9,14 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
+from reportlab.platypus import Image
 
 from datetime import datetime
 
 from .models import CheckIn, CheckOut
 from .serializer import CheckInSerializer, CheckOutSerializer
 from master.models import Room
+from account.models import Institution
 class CheckInViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = CheckInSerializer
@@ -71,11 +73,16 @@ class CheckInViewSet(viewsets.ModelViewSet):
         normal_style = styles['Normal']
 
         # Title Layout Block
-        
-        story.append(Paragraph("Swapna Residency",title_style))
-        story.append(Paragraph("Durga,Hosur,Tamil Nadu",normal_style))
+        institution = Institution.objects.filter(active=True).first()
+
+        story.append(Paragraph(institution.name,title_style))
+        if institution.logo:
+            logo = Image(institution.logo.path, width=80, height=80)
+            story.append(logo)
+        story.append(Paragraph(institution.address,normal_style))
         story.append(Paragraph("CHECK-IN / ADVANCE  RECEIPT", normal_style))
         story.append(Paragraph(f"<b>Receipt Reference:</b> ARR-{checkin.id:06d}", normal_style))
+        story.append(Paragraph(institution.gstin, normal_style))
         story.append(Paragraph(f"<b>Date:</b> {checkin.checkin_date} @ {checkin.checkin_time}", normal_style))
         story.append(Spacer(1, 15))
 
@@ -338,12 +345,18 @@ class CheckOutViewSet(viewsets.ModelViewSet):
             spaceAfter=6
         )
         normal_style = styles['Normal']
+        institution = Institution.objects.filter(active=True).first()
+
 
         # Header Title
-        story.append(Paragraph("Swapna Residency",title_style))
-        story.append(Paragraph("Durga,Hosur,Tamil Nadu",normal_style))
+        story.append(Paragraph(institution.name,title_style))
+        if institution.logo:
+            logo = Image(institution.logo.path, width=80, height=80)
+            story.append(logo)
+        story.append(Paragraph(institution.address,normal_style))
         story.append(Paragraph(" RECEIPT", normal_style))
         story.append(Paragraph(f"<b>Receipt No:</b> REC-{checkout.id:06d}", normal_style))
+        story.append(Paragraph(institution.gstin, normal_style))
         story.append(Paragraph(f"<b>Date:</b> {checkout.created_at.strftime('%Y-%m-%d %H:%M') if hasattr(checkout.created_at, 'strftime') else checkout.created_at}", normal_style))
         story.append(Spacer(1, 15))
 
